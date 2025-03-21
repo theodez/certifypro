@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Entreprise {
+  id           String           @id @default(uuid())
+  nom          String
+  adresse      String?
+  telephone    String?
+  email        String?
+
+  utilisateurs Utilisateur[]
+  equipes      Equipe[]
+  formations   Formation[]
+  calendriers  Calendrier[]
+  devis        Devis[]
+}
+
+model Utilisateur {
+  id                   String           @id @default(uuid())
+  nom                  String
+  prenom               String
+  telephone            String?
+  email                String           @unique
+  role                 String           // "representant", "admin", "controller", etc.
+  num_securite_sociale String?
+  equipeId             String?
+  entrepriseId         String
+  adresse              String?
+  statut_user          String?          // ex: "A jour", "Recyclage requis"
+  qr_code              String?
+  password             String
+
+  entreprise    Entreprise  @relation(fields: [entrepriseId], references: [id])
+  equipe        Equipe?     @relation(name: "EquipeMembres", fields: [equipeId], references: [id])
+  formations    Formation[]
+  calendriers   Calendrier[]
+  devis         Devis[]
+  notifications Notification[]
+  equipesDirigees Equipe[] @relation(name: "EquipeResponsable")
+}
+
+model Equipe {
+  id            String        @id @default(uuid())
+  nom           String
+  entrepriseId  String
+  adresse       String?
+  actif         Boolean       @default(true)
+  code          String?
+  responsableId String?
+  statut_team   String?       // ex: "A jour", "Recyclage requis"
+  qr_code       String?
+
+  entreprise   Entreprise  @relation(fields: [entrepriseId], references: [id])
+  responsable  Utilisateur? @relation(name: "EquipeResponsable", fields: [responsableId], references: [id])
+  utilisateurs Utilisateur[] @relation(name: "EquipeMembres")
+}
+
+model Formation {
+  id                     String       @id @default(uuid())
+  type_formation         String       // ex: "Montage échafaudage"
+  nom                    String
+  description            String?
+  date_expiration        DateTime?
+  validite               Int?         // Durée de validité en mois/années
+  organismeId            String
+  userId                 String       // Utilisateur concerné
+  entrepriseId           String       // Entreprise pour laquelle la formation est organisée
+  date_delivrance        DateTime?
+  obligatoire            Boolean      @default(true)
+  statut_formation       String?      // ex: "Valide", "Expirée"
+  pdf_formation          String?
+  extraction_automatique Boolean?     // Future implémentation OCR/IA
+
+  organisme    OrganismeFormation @relation(fields: [organismeId], references: [id])
+  utilisateur  Utilisateur        @relation(fields: [userId], references: [id])
+  entreprise   Entreprise         @relation(fields: [entrepriseId], references: [id])
+  notifications Notification[]
+}
+
+model OrganismeFormation {
+  id         String      @id @default(uuid())
+  nom        String
+  telephone  String?
+  email      String?
+  adresse    String?
+
+  formations Formation[]
+}
+
+model Calendrier {
+  id           String      @id @default(uuid())
+  titre        String
+  description  String?
+  date_heure   DateTime
+  userId       String
+  entrepriseId String
+  statut       String      // ex: "Planifié", "Effectué", "Annulé"
+
+  utilisateur Utilisateur @relation(fields: [userId], references: [id])
+  entreprise  Entreprise  @relation(fields: [entrepriseId], references: [id])
+  devis       Devis[]
+}
+
+model Devis {
+  id              String      @id @default(uuid())
+  userId          String
+  entrepriseId    String
+  montant         Float
+  statut          String      // ex: "En attente", "Validé", "Refusé", "Payé"
+  date_creation   DateTime
+  date_validation DateTime?
+  date_paiement   DateTime?
+  rdv_id          String?     // Référence au Calendrier si applicable
+
+  utilisateur Utilisateur @relation(fields: [userId], references: [id])
+  entreprise  Entreprise  @relation(fields: [entrepriseId], references: [id])
+  calendrier  Calendrier? @relation(fields: [rdv_id], references: [id])
+}
+
+model Notification {
+  id             String           @id @default(uuid())
+  userId         String
+  formationId    String?
+  type           NotificationType
+  message        String
+  isRead         Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  data           Json?
+
+  utilisateur  Utilisateur @relation(fields: [userId], references: [id])
+  formation    Formation?  @relation(fields: [formationId], references: [id])
+}
+
+enum NotificationType {
+  RDV
+  FORMATION
+  SYSTEM
+}
