@@ -5,6 +5,10 @@ import { getToken } from 'next-auth/jwt';
 // Définir les routes publiques qui ne nécessitent pas d'authentification
 const publicRoutes = ['/', '/login', '/register', '/api/auth'];
 
+// Variable pour stocker la dernière vérification
+let lastCheck: number | null = null;
+const CHECK_INTERVAL = 24 * 60 * 60 * 1000; // 24 heures en millisecondes
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
@@ -42,6 +46,20 @@ export async function middleware(request: NextRequest) {
   if (pathname === '/login' && token) {
     console.log('[Middleware] Utilisateur déjà connecté, redirection vers le dashboard');
     return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  const now = Date.now();
+
+  // Vérifier si nous devons mettre à jour les statuts
+  if (!lastCheck || now - lastCheck > CHECK_INTERVAL) {
+    try {
+      // Appeler l'API de mise à jour des statuts
+      const baseUrl = request.nextUrl.origin;
+      await fetch(`${baseUrl}/api/cron/update-formation-status`);
+      lastCheck = now;
+    } catch (error) {
+      console.error('Erreur lors de la vérification des statuts:', error);
+    }
   }
 
   return NextResponse.next();

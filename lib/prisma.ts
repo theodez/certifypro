@@ -1,7 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 
 // PrismaClient est attaché au scope global en développement pour éviter d'épuiser 
 // le nombre de connexions à la base de données lors du hot-reloading en développement
+
 declare global {
   var prisma: PrismaClient | undefined;
 }

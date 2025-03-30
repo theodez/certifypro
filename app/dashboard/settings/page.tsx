@@ -14,7 +14,6 @@ const delayOptions = ["7j", "15j", "1m"]
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Paramètres</h1>
 
       <Tabs defaultValue="notifications" className="space-y-6">
         <TabsList>

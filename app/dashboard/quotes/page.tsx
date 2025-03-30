@@ -93,7 +93,6 @@ const validatedQuotes: Quote[] = [
 export default function QuotesPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Devis reçus</h1>
 
       {/* Devis en attente */}
       <div className="space-y-4">

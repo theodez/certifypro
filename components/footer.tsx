@@ -78,9 +78,10 @@ export function Footer() {
                 contact@certifypro.fr
               </li>
               <li className="flex items-center">
-                <Phone className="h-4 w-4 mr-2" />
-                01 23 45 67 89
+                <Phone className="mr-2" />
+                <a href="tel:+0123456789">+01 23 45 67 89</a>
               </li>
+
               <li className="flex items-center">
                 <MapPin className="h-4 w-4 mr-2" />
                 Paris, France

@@ -3,39 +3,38 @@ import prisma from "@/lib/prisma";
 import { checkAccess, ROLES, getSessionUser } from "@/lib/rbac";
 
 // GET /api/entreprises/:id/utilisateurs
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id: entrepriseId } = context.params;
-  const { searchParams } = new URL(request.url);
-  
-  // Optional query parameters
+export async function GET(request: NextRequest) {
+  // Extraction de l'ID de l'entreprise depuis l'URL
+  const entrepriseId = request.nextUrl.pathname.split("/").at(-2);
+
+  if (!entrepriseId) {
+    return NextResponse.json({ error: "ID entreprise manquant" }, { status: 400 });
+  }
+
+  const { searchParams } = request.nextUrl;
+
+  // Paramètres optionnels
   const role = searchParams.get("role");
   const equipeId = searchParams.get("equipeId");
-  const page = parseInt(searchParams.get("page") || "1");
-  const limit = parseInt(searchParams.get("limit") || "20");
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "20", 10);
   const skip = (page - 1) * limit;
 
-  // Check user access
+  // Vérification des accès
   const accessError = await checkAccess(request, entrepriseId, ROLES.REPRESENTANT);
   if (accessError) return accessError;
 
-  // Get the current user to determine what level of detail to show
+  // Récupération de l'utilisateur pour déterminer le niveau de détails affiché
   const user = await getSessionUser();
   const isAdmin = user?.role === ROLES.ADMIN;
 
   try {
-    // Build filters
-    const where: any = {
-      entrepriseId,
-    };
-
-    // Add optional filters
+    // Construction des filtres
+    const where: any = { entrepriseId };
     if (role) where.role = role;
     if (equipeId) where.equipeId = equipeId;
 
-    // Query utilisateurs with pagination
+    // Récupération des utilisateurs avec pagination
     const utilisateurs = await prisma.utilisateur.findMany({
       where,
       select: {
@@ -46,7 +45,7 @@ export async function GET(
         role: true,
         equipeId: true,
         statut_user: true,
-        // Include sensitive data only for admins
+        // Inclusion des données sensibles uniquement pour les admins
         ...(isAdmin
           ? {
               telephone: true,
@@ -54,7 +53,7 @@ export async function GET(
               num_securite_sociale: true,
             }
           : {}),
-        // Include associated team information
+        // Inclusion des informations de l'équipe associée
         equipe: {
           select: {
             id: true,
@@ -62,32 +61,20 @@ export async function GET(
           },
         },
       },
-      orderBy: {
-        nom: "asc",
-      },
+      orderBy: { nom: "asc" },
       skip,
       take: limit,
     });
 
-    // Get total count for pagination
-    const total = await prisma.utilisateur.count({
-      where,
-    });
+    // Récupération du nombre total d'utilisateurs pour la pagination
+    const total = await prisma.utilisateur.count({ where });
 
     return NextResponse.json({
       utilisateurs,
-      pagination: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit),
-      },
+      pagination: { total, page, limit, pages: Math.ceil(total / limit) },
     });
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs:", error);
-    return NextResponse.json(
-      { error: "Erreur serveur" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
-} 
+}

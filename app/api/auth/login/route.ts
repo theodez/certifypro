@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { compare } from 'bcrypt';
+import * as argon2 from 'argon2';
 
 export async function POST(request: Request) {
   try {
@@ -26,8 +26,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Vérification du mot de passe
-    const passwordMatch = await compare(password, user.password);
+    // Vérification du mot de passe avec argon2
+    const passwordMatch = await argon2.verify(user.password, password);
 
     if (!passwordMatch) {
       return NextResponse.json(

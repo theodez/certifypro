@@ -1,6 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcrypt";
+import * as argon2 from "argon2";
 import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -28,8 +28,8 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Vérifier le mot de passe
-        const isPasswordValid = await compare(credentials.password, user.password);
+        // Vérifier le mot de passe avec argon2
+        const isPasswordValid = await argon2.verify(user.password, credentials.password);
 
         if (!isPasswordValid) {
           console.log("Mot de passe invalide");
@@ -50,6 +50,17 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 jours
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
   pages: {
     signIn: "/login",

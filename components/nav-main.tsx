@@ -27,19 +27,19 @@ export function NavMain({ sections }: { sections: NavSection[] }) {
   return (
     <>
       {sections.map((section) => (
-        <SidebarGroup key={section.label}>
-          <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
+        <SidebarGroup key={section.label} className="w-full mt-2">
+          <SidebarGroupLabel className="px-4">{section.label}</SidebarGroupLabel>
           {section.items.map((item) => (
             <Link
               key={item.title}
               href={item.url}
               className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100",
-                pathname === item.url && "bg-gray-100 text-blue-600"
+                "flex items-center w-full gap-2 px-4 py-2 rounded-md hover:bg-white/10 hover:backdrop-blur-md",
+                pathname === item.url && "bg-white/10 backdrop-blur-md text-white font-medium"
               )}
             >
-              {item.icon && <item.icon className="h-5 w-5" />}
-              <span>{item.title}</span>
+              {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
+              <span className="truncate text-white">{item.title}</span>
             </Link>
           ))}
         </SidebarGroup>

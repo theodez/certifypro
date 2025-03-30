@@ -1,0 +1,6 @@
+{
+  "crons": [{
+    "path": "/api/cron/update-formation-status",
+    "schedule": "0 0 * * *"
+  }]
+} 

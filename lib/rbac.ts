@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/auth";
+import { authOptions } from "@/lib/auth";
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 export const ROLES = {
   REPRESENTANT: "representant", // Chef de chantier - accès limité
   ADMIN: "admin",               // Admin, RH - accès complet
+  OUVRIER: "ouvrier",
 };
 
 // Helper to get current session user

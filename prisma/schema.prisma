@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -35,20 +29,18 @@ model Utilisateur {
   email                String           @unique
   role                 String           // "representant", "admin", "controller", etc.
   num_securite_sociale String?
-  equipeId             String?
   entrepriseId         String
   adresse              String?
-  statut_user          String?          // ex: "A jour", "Recyclage requis"
   qr_code              String?
   password             String
 
-  entreprise    Entreprise  @relation(fields: [entrepriseId], references: [id])
-  equipe        Equipe?     @relation(name: "EquipeMembres", fields: [equipeId], references: [id])
-  formations    Formation[]
-  calendriers   Calendrier[]
-  devis         Devis[]
-  notifications Notification[]
-  equipesDirigees Equipe[] @relation(name: "EquipeResponsable")
+  entreprise      Entreprise    @relation(fields: [entrepriseId], references: [id])
+  equipesMembre   Equipe[]      @relation("MembresEquipes")
+  equipesResponsable Equipe[]   @relation("ResponsablesEquipes")
+  formations      Formation[]
+  calendriers     Calendrier[]
+  devis           Devis[]
+  notifications   Notification[]
 }
 
 model Equipe {
@@ -58,13 +50,11 @@ model Equipe {
   adresse       String?
   actif         Boolean       @default(true)
   code          String?
-  responsableId String?
-  statut_team   String?       // ex: "A jour", "Recyclage requis"
   qr_code       String?
 
-  entreprise   Entreprise  @relation(fields: [entrepriseId], references: [id])
-  responsable  Utilisateur? @relation(name: "EquipeResponsable", fields: [responsableId], references: [id])
-  utilisateurs Utilisateur[] @relation(name: "EquipeMembres")
+  entreprise    Entreprise     @relation(fields: [entrepriseId], references: [id])
+  membres       Utilisateur[]  @relation("MembresEquipes")
+  responsables  Utilisateur[]  @relation("ResponsablesEquipes")
 }
 
 model Formation {
@@ -79,7 +69,6 @@ model Formation {
   entrepriseId           String       // Entreprise pour laquelle la formation est organisée
   date_delivrance        DateTime?
   obligatoire            Boolean      @default(true)
-  statut_formation       String?      // ex: "Valide", "Expirée"
   pdf_formation          String?
   extraction_automatique Boolean?     // Future implémentation OCR/IA
 

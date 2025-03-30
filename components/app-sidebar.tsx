@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import {
   LayoutDashboard,
@@ -21,12 +19,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-const navigationSections = [
+export const navigationSections = [
   {
     label: "Dashboard",
     items: [
       {
-        title: "Vue d'ensemble",
+        title: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
       },
@@ -73,17 +71,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-2">
+        <div className="flex items-center gap-2 px-4 py-2 bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)]">
           <span className="text-xl font-bold">CertifyPro</span>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)]">
         <NavMain sections={navigationSections} />
       </SidebarContent>
-      <SidebarFooter>
+      
+      <div className="border-t border-gray-800 my-2" />
+      
+      <SidebarFooter className="bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)]">
         <NavUser />
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarRail className="bg-[var(--sidebar-border)]" />
     </Sidebar>
   )
 }

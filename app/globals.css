@@ -43,14 +43,18 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-background: 220 40% 10%; /* Bleu nuit profond */
+    --sidebar-foreground: 0 0% 98%; /* Blanc */
+    --sidebar-hover: 40 60% 80%; /* Beige clair */
+    --sidebar-border: 220 30% 15%; /* Bordure légèrement plus claire */
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --status-valid: 142 76% 36%;
+    --status-warning: 38 92% 50%;
+    --status-expired: 0 84% 60%;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -85,6 +89,9 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --status-valid: 142 76% 46%;
+    --status-warning: 38 92% 60%;
+    --status-expired: 0 84% 70%;
   }
 }
 
@@ -154,5 +161,63 @@ html {
 .backdrop-blur-xl {
   backdrop-filter: blur(15px);
   background-color: rgba(255, 255, 255, 0.15); /* Un verre légèrement opaque avec un fond transparent */
+}
+
+@layer utilities {
+  .text-status-valid {
+    color: hsl(var(--status-valid));
+  }
+  .text-status-warning {
+    color: hsl(var(--status-warning));
+  }
+  .text-status-expired {
+    color: hsl(var(--status-expired));
+  }
+  .bg-status-valid {
+    background-color: hsl(var(--status-valid));
+  }
+  .bg-status-warning {
+    background-color: hsl(var(--status-warning));
+  }
+  .bg-status-expired {
+    background-color: hsl(var(--status-expired));
+  }
+  .border-status-valid {
+    border-color: hsl(var(--status-valid));
+  }
+  .border-status-warning {
+    border-color: hsl(var(--status-warning));
+  }
+  .border-status-expired {
+    border-color: hsl(var(--status-expired));
+  }
+  /* Ajout des effets de lueur pour les cartes */
+  .glow-status-valid {
+    box-shadow: 0 0 20px -5px hsl(var(--status-valid) / 0.3);
+  }
+  .glow-status-warning {
+    box-shadow: 0 0 20px -5px hsl(var(--status-warning) / 0.3);
+  }
+  .glow-status-expired {
+    box-shadow: 0 0 20px -5px hsl(var(--status-expired) / 0.3);
+  }
+  /* Effet de lueur en arrière-plan */
+  .bg-glow-status-valid {
+    background: radial-gradient(circle at 15% 40%, hsl(var(--status-valid) / 0.08), transparent 50%),
+                radial-gradient(circle at 70% 60%, hsl(var(--status-valid) / 0.06), transparent 55%),
+                radial-gradient(circle at 40% 80%, hsl(var(--status-valid) / 0.04), transparent 60%);
+  }
+  
+  .bg-glow-status-warning {
+    background: radial-gradient(circle at 25% 35%, hsl(var(--status-warning) / 0.08), transparent 50%),
+                radial-gradient(circle at 60% 75%, hsl(var(--status-warning) / 0.06), transparent 55%),
+                radial-gradient(circle at 85% 50%, hsl(var(--status-warning) / 0.04), transparent 60%);
+  }
+  
+  .bg-glow-status-expired {
+    background: radial-gradient(circle at 10% 50%, hsl(var(--status-expired) / 0.08), transparent 30%),
+                radial-gradient(circle at 55% 30%, hsl(var(--status-expired) / 0.06), transparent 45%),
+                radial-gradient(circle at 90% 70%, hsl(var(--status-expired) / 0.04), transparent 50%);
+  }
 }
 
